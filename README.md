@@ -3,7 +3,7 @@
 > **An open-source family budget planner built for real life.**  
 > Free. No accounts. No backend. Just open your browser and start budgeting.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/tadeniran121/familybudget)
 
 ---
@@ -14,7 +14,7 @@
 |---|---|
 | **Version** | 0.1 — Initial Draft |
 | **Status** | In Review |
-| **License** | MIT |
+| **License** | GNU General Public License v3.0 |
 | **Repository** | [github.com/tadeniran121/familybudget](https://github.com/tadeniran121/familybudget) |
 
 ---
@@ -241,7 +241,19 @@ All categories are fully configurable — rename, add, remove, or hide any item 
 
 ### 7.1 Licence
 
-FamilyBudget is released under the **MIT Licence**. Anyone may use, fork, modify, and redistribute the code for any purpose, including commercially, with attribution.
+FamilyBudget is released under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+This means:
+
+- ✅ Anyone may use, study, and modify the code freely
+- ✅ Anyone may distribute copies of the original or modified versions
+- ⚠️ Any modified version that is distributed **must also be released under GPL-3.0** — you cannot make it proprietary
+- ⚠️ The full licence text and copyright notice must be included with any distribution
+- ⚠️ If you build a web service using this code and make it available to others, the source code must also be made available (via the AGPL-3.0 clause, if applicable)
+
+This is a **copyleft** licence — it ensures FamilyBudget and any derivative work remains free and open for everyone. See the [`LICENSE`](./LICENSE) file in this repository for the full terms.
+
+> 💡 **Why GPL-3.0?** It protects the community. Anyone who improves FamilyBudget must share those improvements back, keeping the project open for all families to benefit from.
 
 ### 7.2 Contribution Structure
 
@@ -311,5 +323,5 @@ Clear code structure, well-documented components, and a welcoming contributor ex
 ---
 
 <div align="center">
-  <sub>Built with ❤️ for families everywhere · <a href="https://github.com/tadeniran121/familybudget">github.com/tadeniran121/familybudget</a></sub>
+  <sub>Built with ❤️ for families everywhere · Licensed under <a href="./LICENSE">GNU GPL v3.0</a> · <a href="https://github.com/tadeniran121/familybudget">github.com/tadeniran121/familybudget</a></sub>
 </div>
