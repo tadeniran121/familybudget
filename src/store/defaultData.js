@@ -233,16 +233,16 @@ export function createEmptyMonths() {
 }
 
 export function createInitialState() {
+  const defaultMembers = [{ id: 'm1', label: 'Partner 1', name: '' }]
   return {
-    version: '0.1',
+    version: '0.2',
     year: new Date().getFullYear(),
     currency: 'GBP',
     household: {
       name: '',
-      members: [
-        { id: 'm1', label: 'Partner 1', name: '' },
-      ],
+      members: defaultMembers,
     },
+    incomeItems: createDefaultIncomeItems(defaultMembers),
     groups: DEFAULT_CATEGORY_GROUPS,
     months: createEmptyMonths(),
   }

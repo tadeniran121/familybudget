@@ -4,16 +4,21 @@ export function getAllEnabledCategories(groups) {
     .flatMap(g => g.categories.filter(c => c.enabled).map(c => ({ ...c, groupId: g.id, groupType: g.type })))
 }
 
-export function sumByType(groups, monthData, type, field = 'budget') {
+function sumByType(groups, monthData, type, field = 'budget') {
   const cats = getAllEnabledCategories(groups).filter(c => c.groupType === type)
   return cats.reduce((sum, cat) => sum + (Number(monthData[field]?.[cat.id]) || 0), 0)
 }
 
-export function getMonthSummary(groups, monthData) {
-  const income = sumByType(groups, monthData, 'income', 'budget')
+// Income comes from incomeItems — each item's monthly equivalent is stored in months[].budget[item.id]
+function sumIncome(incomeItems, monthData, field = 'budget') {
+  return (incomeItems ?? []).reduce((sum, item) => sum + (Number(monthData[field]?.[item.id]) || 0), 0)
+}
+
+export function getMonthSummary(groups, monthData, incomeItems = []) {
+  const income = sumIncome(incomeItems, monthData, 'budget')
   const savings = sumByType(groups, monthData, 'savings', 'budget')
   const expenses = sumByType(groups, monthData, 'expense', 'budget')
-  const actualIncome = sumByType(groups, monthData, 'income', 'actuals')
+  const actualIncome = sumIncome(incomeItems, monthData, 'actuals')
   const actualSavings = sumByType(groups, monthData, 'savings', 'actuals')
   const actualExpenses = sumByType(groups, monthData, 'expense', 'actuals')
   return {
@@ -28,8 +33,8 @@ export function getMonthSummary(groups, monthData) {
   }
 }
 
-export function getYearSummary(groups, months) {
-  return months.map(m => getMonthSummary(groups, m))
+export function getYearSummary(groups, months, incomeItems = []) {
+  return months.map(m => getMonthSummary(groups, m, incomeItems))
 }
 
 export function getCategoryAnnualTotal(months, categoryId, field = 'budget') {

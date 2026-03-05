@@ -20,10 +20,10 @@ const TABS = ['Year Overview', 'Category Breakdown', 'Savings Tracker']
 
 export default function Reports() {
   const { state } = useBudget()
-  const { groups, months, currency, year } = state
+  const { groups, months, currency, year, incomeItems = [] } = state
   const [tab, setTab] = useState(0)
 
-  const yearSummary = useMemo(() => getYearSummary(groups, months), [groups, months])
+  const yearSummary = useMemo(() => getYearSummary(groups, months, incomeItems), [groups, months, incomeItems])
 
   const yearChartData = yearSummary.map((s, i) => ({
     name: MONTH_SHORT[i],

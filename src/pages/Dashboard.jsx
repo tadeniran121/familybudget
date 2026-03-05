@@ -19,12 +19,12 @@ const CHART_COLORS = [
 
 export default function Dashboard({ activeMonth }) {
   const { state } = useBudget()
-  const { groups, months, currency } = state
+  const { groups, months, currency, incomeItems = [] } = state
 
   const monthData = months.find(m => m.month === activeMonth) ?? months[0]
-  const summary = useMemo(() => getMonthSummary(groups, monthData), [groups, monthData])
+  const summary = useMemo(() => getMonthSummary(groups, monthData, incomeItems), [groups, monthData, incomeItems])
   const spendingByCategory = useMemo(() => getSpendingByCategory(groups, monthData), [groups, monthData])
-  const yearSummary = useMemo(() => getYearSummary(groups, months), [groups, months])
+  const yearSummary = useMemo(() => getYearSummary(groups, months, incomeItems), [groups, months, incomeItems])
 
   const yearChartData = yearSummary.map((s, i) => ({
     name: MONTH_SHORT[i],

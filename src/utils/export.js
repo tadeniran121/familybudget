@@ -3,12 +3,22 @@ import { getAllEnabledCategories } from './calculations.js'
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 export function exportToCSV(state) {
-  const { groups, months, household, year } = state
+  const { groups, months, household, year, incomeItems = [] } = state
   const cats = getAllEnabledCategories(groups)
 
   const headers = ['Category', 'Group', 'Type', ...MONTHS.map(m => `${m} Budget`), ...MONTHS.map(m => `${m} Actual`), 'Annual Budget', 'Annual Actual']
 
-  const rows = cats.map(cat => {
+  // Income item rows
+  const incomeRows = incomeItems.map(item => {
+    const budgets = months.map(m => m.budget?.[item.id] ?? '')
+    const actuals = months.map(m => m.actuals?.[item.id] ?? '')
+    const annualBudget = budgets.reduce((s, v) => s + (Number(v) || 0), 0)
+    const annualActual = actuals.reduce((s, v) => s + (Number(v) || 0), 0)
+    return [item.label || 'Income', 'Income', 'income', ...budgets, ...actuals, annualBudget, annualActual]
+  })
+
+  // Expense/savings category rows
+  const catRows = cats.map(cat => {
     const group = groups.find(g => g.id === cat.groupId)
     const budgets = months.map(m => m.budget?.[cat.id] ?? '')
     const actuals = months.map(m => m.actuals?.[cat.id] ?? '')
@@ -17,7 +27,7 @@ export function exportToCSV(state) {
     return [cat.label, group?.label ?? '', group?.type ?? '', ...budgets, ...actuals, annualBudget, annualActual]
   })
 
-  const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+  const csv = [headers, ...incomeRows, ...catRows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
   downloadFile(csv, `FamilyBudget_${household.name}_${year}.csv`, 'text/csv')
 }
 

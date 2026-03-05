@@ -1,6 +1,24 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react'
 import { ACTIONS } from './actions.js'
-import { createInitialState } from './defaultData.js'
+import { createInitialState, createDefaultIncomeItems, computeMonthlyEquivalent } from './defaultData.js'
+
+// Write one income item's monthly equivalent into all 12 months' budget
+function syncItemToMonths(months, item) {
+  const monthly = computeMonthlyEquivalent(item.amount, item.frequency)
+  return months.map(m => ({
+    ...m,
+    budget: { ...m.budget, [item.id]: monthly },
+  }))
+}
+
+// Zero out an income item across all months (used on removal)
+function zeroItemInMonths(months, itemId) {
+  return months.map(m => {
+    const budget = { ...m.budget }
+    delete budget[itemId]
+    return { ...m, budget }
+  })
+}
 
 const STORAGE_KEY = 'familybudget_v1'
 
@@ -19,13 +37,15 @@ function reducer(state, action) {
       return { ...state, year: action.payload }
 
     case ACTIONS.ADD_MEMBER: {
-      const id = `m${Date.now()}`
+      const newMember = { id: `m${Date.now()}`, label: `Partner ${state.household.members.length + 1}`, name: '' }
+      const newItem = createDefaultIncomeItems([newMember])[0]
       return {
         ...state,
         household: {
           ...state.household,
-          members: [...state.household.members, { id, label: `Partner ${state.household.members.length + 1}`, name: '' }],
+          members: [...state.household.members, newMember],
         },
+        incomeItems: [...(state.incomeItems ?? []), newItem],
       }
     }
 
@@ -40,14 +60,21 @@ function reducer(state, action) {
       }
     }
 
-    case ACTIONS.REMOVE_MEMBER:
+    case ACTIONS.REMOVE_MEMBER: {
+      const removedId = action.payload
+      const itemsToRemove = (state.incomeItems ?? []).filter(i => i.memberId === removedId)
+      let months = state.months
+      itemsToRemove.forEach(item => { months = zeroItemInMonths(months, item.id) })
       return {
         ...state,
         household: {
           ...state.household,
-          members: state.household.members.filter(m => m.id !== action.payload),
+          members: state.household.members.filter(m => m.id !== removedId),
         },
+        incomeItems: (state.incomeItems ?? []).filter(i => i.memberId !== removedId),
+        months,
       }
+    }
 
     case ACTIONS.UPDATE_GROUP:
       return {
@@ -140,6 +167,34 @@ function reducer(state, action) {
           ? { ...m, budget: { ...source.budget } }
           : m
         ),
+      }
+    }
+
+    case ACTIONS.ADD_INCOME_ITEM: {
+      const item = action.payload
+      return {
+        ...state,
+        incomeItems: [...(state.incomeItems ?? []), item],
+        months: syncItemToMonths(state.months, item),
+      }
+    }
+
+    case ACTIONS.UPDATE_INCOME_ITEM: {
+      const updated = action.payload
+      const newItems = (state.incomeItems ?? []).map(i => i.id === updated.id ? updated : i)
+      return {
+        ...state,
+        incomeItems: newItems,
+        months: syncItemToMonths(state.months, updated),
+      }
+    }
+
+    case ACTIONS.REMOVE_INCOME_ITEM: {
+      const itemId = action.payload
+      return {
+        ...state,
+        incomeItems: (state.incomeItems ?? []).filter(i => i.id !== itemId),
+        months: zeroItemInMonths(state.months, itemId),
       }
     }
 
